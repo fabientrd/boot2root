@@ -1,6 +1,7 @@
 Lorsque nous lancons la VM nous remarquons qu'aucune adresse IP nous est fournie.
 Nous allons donc devoir scanner notre reseau pour voir les adresses utilisées.
 
+```
 nmap -sn 192.168.1.0/24
 Nmap scan report for BornToSecHackMe (192.168.1.50)
 nmap 192.168.1.50
@@ -17,7 +18,7 @@ PORT    STATE SERVICE
 993/tcp open  imaps
 
 Nmap done: 1 IP address (1 host up) scanned in 4.63 seconds
-
+```
 Nous voyons donc plusieurs ports ouverts pour cette adresse IP dont notamment les 80 et 443 qui correspondent au protocol http et https ainsi que le port 21 et 22 qui correspondent au ftp et ssh respectivement.
 
 Dans Kali Linux nous avons deux outils utils pour la recherche de vulnerabilites web que nous avons deja utilisés pour Darkly :
