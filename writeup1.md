@@ -1,3 +1,9 @@
+### PRECISION
+
+TOUTES LES COMMANDES EXECUTEES ULTERIEUREMENT SONT DEPENDANTE DU RESEAU SUR LEQUEL NOUS SOMMES. LES ADRESSES IP PEUVENT CHANGER, AUQUEL CAS IL FAUDRA ADAPTER NOS COMMANDES
+
+### Début
+
 Lorsque nous lancons la VM nous remarquons qu'aucune adresse IP nous est fournie.
 Nous allons donc devoir scanner notre reseau pour voir les adresses utilisées.
 
@@ -171,6 +177,8 @@ www-data
 $ uname -a
 Linux BornToSecHackMe 3.2.0-91-generic-pae #129-Ubuntu SMP Wed Sep 9 11:27:47 UTC 2015 i686 i686 i386 GNU/Linux
 ```
+
+### WWWW-DATA
 
 La premiere idée qui me vient est d'essayer de faire une injection dynamique de librairie des plus classiques comme pour le level13 de snowcrash.
 
