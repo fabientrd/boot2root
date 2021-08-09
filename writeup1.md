@@ -68,3 +68,7 @@ nikto -h https://192.168.1.50
 ---------------------------------------------------------------------------
 + 1 host(s) tested
 ```
+
+Nous voyons ici plusieurs routes que nous allons explorer pour voir si nous trouvons quelque chose d'interessant. La premiere étant /forum/:
+
+![b2r_1](./photos/b2r_1.png)
