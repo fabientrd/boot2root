@@ -71,4 +71,15 @@ nikto -h https://192.168.1.50
 
 Nous voyons ici plusieurs routes que nous allons explorer pour voir si nous trouvons quelque chose d'interessant. La premiere étant /forum/:
 
+### Forum
+
 ![b2r_1](./photos/b2r_1.png)
+
+En fouillant un peu dans la section 'Probleme login ?' nous trouvons quelque chose d'interessant : 
+
+curl --insecure https://192.168.1.50/forum/index.php\?id\=6 | grep "invalid user"
+```
+Oct  5 08:45:29 BornToSecHackMe sshd[7547]: Failed password for invalid user !q\]Ej?*5K5cy*AJ from 161.202.39.38 port 57764 ssh2<br />
+```
+
+
