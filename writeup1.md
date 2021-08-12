@@ -356,7 +356,7 @@ On remarque plusieurs fonctions dans le main interessantes :
 0x08048ee8  secret_phase
 ```
 
-####Phase1
+#### Phase1
 
 ```
 gdb-peda$ disas phase_1
