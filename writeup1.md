@@ -426,3 +426,274 @@ Dump of assembler code for function phase_2:
    0x08048b96 <+78>:	ret
 End of assembler dump.
 ```
+
+La fonction read_six_numbers nous laisse entendre que la deuxieme phase attend un suite de 6 nombre qu'il va falloir trouver.
+
+Pour trouver les valeurs attendues nous y allons a tatons en regardant la valeur de eax a chaque passage dans la boucle et nous arrivons sur la suite suivante :1 2 6 24 120 720. Cette suite match bien avec l'indice présent dans le README
+
+####Phase 3
+
+```
+(gdb) disas phase_3
+Dump of assembler code for function phase_3:
+   0x08048b98 <+0>:	push   %ebp
+   0x08048b99 <+1>:	mov    %esp,%ebp
+   0x08048b9b <+3>:	sub    $0x14,%esp
+   0x08048b9e <+6>:	push   %ebx
+   0x08048b9f <+7>:	mov    0x8(%ebp),%edx
+   0x08048ba2 <+10>:	add    $0xfffffff4,%esp
+   0x08048ba5 <+13>:	lea    -0x4(%ebp),%eax
+   0x08048ba8 <+16>:	push   %eax
+   0x08048ba9 <+17>:	lea    -0x5(%ebp),%eax
+   0x08048bac <+20>:	push   %eax
+   0x08048bad <+21>:	lea    -0xc(%ebp),%eax
+   0x08048bb0 <+24>:	push   %eax
+   0x08048bb1 <+25>:	push   $0x80497de
+   0x08048bb6 <+30>:	push   %edx
+   0x08048bb7 <+31>:	call   0x8048860 <sscanf@plt>
+   0x08048bbc <+36>:	add    $0x20,%esp
+   0x08048bbf <+39>:	cmp    $0x2,%eax
+   0x08048bc2 <+42>:	jg     0x8048bc9 <phase_3+49>
+   0x08048bc4 <+44>:	call   0x80494fc <explode_bomb>
+   0x08048bc9 <+49>:	cmpl   $0x7,-0xc(%ebp)
+   0x08048bcd <+53>:	ja     0x8048c88 <phase_3+240>
+   0x08048bd3 <+59>:	mov    -0xc(%ebp),%eax
+   0x08048bd6 <+62>:	jmp    *0x80497e8(,%eax,4)
+   0x08048bdd <+69>:	lea    0x0(%esi),%esi
+   0x08048be0 <+72>:	mov    $0x71,%bl
+   0x08048be2 <+74>:	cmpl   $0x309,-0x4(%ebp)
+   0x08048be9 <+81>:	je     0x8048c8f <phase_3+247>
+   0x08048bef <+87>:	call   0x80494fc <explode_bomb>
+   0x08048bf4 <+92>:	jmp    0x8048c8f <phase_3+247>
+   0x08048bf9 <+97>:	lea    0x0(%esi,%eiz,1),%esi
+   0x08048c00 <+104>:	mov    $0x62,%bl
+   0x08048c02 <+106>:	cmpl   $0xd6,-0x4(%ebp)
+   0x08048c09 <+113>:	je     0x8048c8f <phase_3+247>
+   0x08048c0f <+119>:	call   0x80494fc <explode_bomb>
+   0x08048c14 <+124>:	jmp    0x8048c8f <phase_3+247>
+   0x08048c16 <+126>:	mov    $0x62,%bl
+   0x08048c18 <+128>:	cmpl   $0x2f3,-0x4(%ebp)
+   0x08048c1f <+135>:	je     0x8048c8f <phase_3+247>
+   0x08048c21 <+137>:	call   0x80494fc <explode_bomb>
+   0x08048c26 <+142>:	jmp    0x8048c8f <phase_3+247>
+   0x08048c28 <+144>:	mov    $0x6b,%bl
+   0x08048c2a <+146>:	cmpl   $0xfb,-0x4(%ebp)
+   0x08048c31 <+153>:	je     0x8048c8f <phase_3+247>
+   0x08048c33 <+155>:	call   0x80494fc <explode_bomb>
+   0x08048c38 <+160>:	jmp    0x8048c8f <phase_3+247>
+   0x08048c3a <+162>:	lea    0x0(%esi),%esi
+   0x08048c40 <+168>:	mov    $0x6f,%bl
+   0x08048c42 <+170>:	cmpl   $0xa0,-0x4(%ebp)
+   0x08048c49 <+177>:	je     0x8048c8f <phase_3+247>
+   0x08048c4b <+179>:	call   0x80494fc <explode_bomb>
+   0x08048c50 <+184>:	jmp    0x8048c8f <phase_3+247>
+   0x08048c52 <+186>:	mov    $0x74,%bl
+   0x08048c54 <+188>:	cmpl   $0x1ca,-0x4(%ebp)
+   0x08048c5b <+195>:	je     0x8048c8f <phase_3+247>
+   0x08048c5d <+197>:	call   0x80494fc <explode_bomb>
+   0x08048c62 <+202>:	jmp    0x8048c8f <phase_3+247>
+   0x08048c64 <+204>:	mov    $0x76,%bl
+   0x08048c66 <+206>:	cmpl   $0x30c,-0x4(%ebp)
+   0x08048c6d <+213>:	je     0x8048c8f <phase_3+247>
+   0x08048c6f <+215>:	call   0x80494fc <explode_bomb>
+   0x08048c74 <+220>:	jmp    0x8048c8f <phase_3+247>
+   0x08048c76 <+222>:	mov    $0x62,%bl
+   0x08048c78 <+224>:	cmpl   $0x20c,-0x4(%ebp)
+   0x08048c7f <+231>:	je     0x8048c8f <phase_3+247>
+   0x08048c81 <+233>:	call   0x80494fc <explode_bomb>
+   0x08048c86 <+238>:	jmp    0x8048c8f <phase_3+247>
+   0x08048c88 <+240>:	mov    $0x78,%bl
+   0x08048c8a <+242>:	call   0x80494fc <explode_bomb>
+   0x08048c8f <+247>:	cmp    -0x5(%ebp),%bl
+   0x08048c92 <+250>:	je     0x8048c99 <phase_3+257>
+   0x08048c94 <+252>:	call   0x80494fc <explode_bomb>
+   0x08048c99 <+257>:	mov    -0x18(%ebp),%ebx
+   0x08048c9c <+260>:	mov    %ebp,%esp
+   0x08048c9e <+262>:	pop    %ebp
+   0x08048c9f <+263>:	ret
+End of assembler dump.
+```
+
+Nous remarquons ici la présence d'un scanf qui va attendre un int suivi d'un char puis d'un autre int. Grace au README nous savons deja que le char sera un 'b' (0x62). Il faudra donc s'interesser uniquement aux switch pour lesquel le caractere 'b' sera cmp :
+
+```
+   0x08048c00 <+104>:	mov    $0x62,%bl 
+   0x08048c02 <+106>:	cmpl   $0xd6,-0x4(%ebp) // case 1 du switch
+
+   0x08048c16 <+126>:	mov    $0x62,%bl
+   0x08048c18 <+128>:	cmpl   $0x2f3,-0x4(%ebp) // case 2 du switch
+
+   0x08048c76 <+222>:	mov    $0x62,%bl
+   0x08048c78 <+224>:	cmpl   $0x20c,-0x4(%ebp) // case 7 du switch
+```
+
+Donc avons donc 3 combinaisons possibles qui fonctionne toutes : 1 b 214, 2 b 755 et 7 b 524. Il faudra donc tester les 3 possibilités pour le password final.
+
+####Phase 4
+
+Pour cette phase le README ne nous donne aucun indice.
+
+```
+(gdb) disas phase_4
+Dump of assembler code for function phase_4:
+   0x08048ce0 <+0>:	push   %ebp
+   0x08048ce1 <+1>:	mov    %esp,%ebp
+   0x08048ce3 <+3>:	sub    $0x18,%esp
+   0x08048ce6 <+6>:	mov    0x8(%ebp),%edx
+   0x08048ce9 <+9>:	add    $0xfffffffc,%esp
+   0x08048cec <+12>:	lea    -0x4(%ebp),%eax
+   0x08048cef <+15>:	push   %eax
+   0x08048cf0 <+16>:	push   $0x8049808
+   0x08048cf5 <+21>:	push   %edx
+   0x08048cf6 <+22>:	call   0x8048860 <sscanf@plt>
+   0x08048cfb <+27>:	add    $0x10,%esp
+   0x08048cfe <+30>:	cmp    $0x1,%eax
+   0x08048d01 <+33>:	jne    0x8048d09 <phase_4+41>
+   0x08048d03 <+35>:	cmpl   $0x0,-0x4(%ebp)
+   0x08048d07 <+39>:	jg     0x8048d0e <phase_4+46>
+   0x08048d09 <+41>:	call   0x80494fc <explode_bomb>
+   0x08048d0e <+46>:	add    $0xfffffff4,%esp
+   0x08048d11 <+49>:	mov    -0x4(%ebp),%eax
+   0x08048d14 <+52>:	push   %eax
+   0x08048d15 <+53>:	call   0x8048ca0 <func4>
+   0x08048d1a <+58>:	add    $0x10,%esp
+   0x08048d1d <+61>:	cmp    $0x37,%eax
+   0x08048d20 <+64>:	je     0x8048d27 <phase_4+71>
+   0x08048d22 <+66>:	call   0x80494fc <explode_bomb>
+   0x08048d27 <+71>:	mov    %ebp,%esp
+   0x08048d29 <+73>:	pop    %ebp
+   0x08048d2a <+74>:	ret
+End of assembler dump.
+(gdb) disas func4
+Dump of assembler code for function func4:
+   0x08048ca0 <+0>:	push   %ebp
+   0x08048ca1 <+1>:	mov    %esp,%ebp
+   0x08048ca3 <+3>:	sub    $0x10,%esp
+   0x08048ca6 <+6>:	push   %esi
+   0x08048ca7 <+7>:	push   %ebx
+   0x08048ca8 <+8>:	mov    0x8(%ebp),%ebx
+   0x08048cab <+11>:	cmp    $0x1,%ebx
+   0x08048cae <+14>:	jle    0x8048cd0 <func4+48>
+   0x08048cb0 <+16>:	add    $0xfffffff4,%esp
+   0x08048cb3 <+19>:	lea    -0x1(%ebx),%eax
+   0x08048cb6 <+22>:	push   %eax
+   0x08048cb7 <+23>:	call   0x8048ca0 <func4>
+   0x08048cbc <+28>:	mov    %eax,%esi
+   0x08048cbe <+30>:	add    $0xfffffff4,%esp
+   0x08048cc1 <+33>:	lea    -0x2(%ebx),%eax
+   0x08048cc4 <+36>:	push   %eax
+   0x08048cc5 <+37>:	call   0x8048ca0 <func4>
+   0x08048cca <+42>:	add    %esi,%eax
+   0x08048ccc <+44>:	jmp    0x8048cd5 <func4+53>
+   0x08048cce <+46>:	mov    %esi,%esi
+   0x08048cd0 <+48>:	mov    $0x1,%eax
+   0x08048cd5 <+53>:	lea    -0x18(%ebp),%esp
+   0x08048cd8 <+56>:	pop    %ebx
+   0x08048cd9 <+57>:	pop    %esi
+   0x08048cda <+58>:	mov    %ebp,%esp
+   0x08048cdc <+60>:	pop    %ebp
+   0x08048cdd <+61>:	ret
+End of assembler dump.
+```
+
+La phase 4 attend un int avec le sscanf 
+
+On place un breakpoint après le retour de la fonction func4 pour check la valeur de eax qui va etre comparée juste apres avec 0x37 et on fait des test. Lorsque l'on rentre le chiffre 9 eax et bien egal a 55 (0x37) et la phase 4 est réussie.
+```
+9
+
+Breakpoint 1, 0x08048d1a in phase_4 ()
+(gdb) i reg
+eax            0x37	55
+ecx            0x0	0
+edx            0x0	0
+ebx            0xbffff7c4	-1073743932
+esp            0xbffff6d0	0xbffff6d0
+ebp            0xbffff6f8	0xbffff6f8
+esi            0x0	0
+edi            0x0	0
+eip            0x8048d1a	0x8048d1a <phase_4+58>
+eflags         0x200202	[ IF ID ]
+cs             0x73	115
+ss             0x7b	123
+ds             0x7b	123
+es             0x7b	123
+fs             0x0	0
+gs             0x33	51
+(gdb) c
+Continuing.
+So you got that one.  Try this one.
+```
+
+####Phase 5
+Ici l'indice donne par le README est o en premiere position.
+
+```
+(gdb) disas phase_5
+Dump of assembler code for function phase_5:
+   0x08048d2c <+0>:	push   %ebp
+   0x08048d2d <+1>:	mov    %esp,%ebp
+   0x08048d2f <+3>:	sub    $0x10,%esp
+   0x08048d32 <+6>:	push   %esi
+   0x08048d33 <+7>:	push   %ebx
+   0x08048d34 <+8>:	mov    0x8(%ebp),%ebx
+   0x08048d37 <+11>:	add    $0xfffffff4,%esp
+   0x08048d3a <+14>:	push   %ebx
+   0x08048d3b <+15>:	call   0x8049018 <string_length>
+   0x08048d40 <+20>:	add    $0x10,%esp
+   0x08048d43 <+23>:	cmp    $0x6,%eax
+   0x08048d46 <+26>:	je     0x8048d4d <phase_5+33>
+   0x08048d48 <+28>:	call   0x80494fc <explode_bomb>
+   0x08048d4d <+33>:	xor    %edx,%edx
+   0x08048d4f <+35>:	lea    -0x8(%ebp),%ecx
+   0x08048d52 <+38>:	mov    $0x804b220,%esi
+   0x08048d57 <+43>:	mov    (%edx,%ebx,1),%al
+   0x08048d5a <+46>:	and    $0xf,%al
+   0x08048d5c <+48>:	movsbl %al,%eax
+   0x08048d5f <+51>:	mov    (%eax,%esi,1),%al
+   0x08048d62 <+54>:	mov    %al,(%edx,%ecx,1)
+   0x08048d65 <+57>:	inc    %edx
+   0x08048d66 <+58>:	cmp    $0x5,%edx
+   0x08048d69 <+61>:	jle    0x8048d57 <phase_5+43>
+   0x08048d6b <+63>:	movb   $0x0,-0x2(%ebp)
+   0x08048d6f <+67>:	add    $0xfffffff8,%esp
+   0x08048d72 <+70>:	push   $0x804980b
+   0x08048d77 <+75>:	lea    -0x8(%ebp),%eax
+   0x08048d7a <+78>:	push   %eax
+   0x08048d7b <+79>:	call   0x8049030 <strings_not_equal>
+   0x08048d80 <+84>:	add    $0x10,%esp
+   0x08048d83 <+87>:	test   %eax,%eax
+   0x08048d85 <+89>:	je     0x8048d8c <phase_5+96>
+   0x08048d87 <+91>:	call   0x80494fc <explode_bomb>
+   0x08048d8c <+96>:	lea    -0x18(%ebp),%esp
+   0x08048d8f <+99>:	pop    %ebx
+   0x08048d90 <+100>:	pop    %esi
+   0x08048d91 <+101>:	mov    %ebp,%esp
+   0x08048d93 <+103>:	pop    %ebp
+   0x08048d94 <+104>:	ret
+End of assembler dump.
+```
+
+Nous voyson en phase_5+23 que la fonction attend une string de 6 caracteres
+Nous avons egalement plusieurs point interessant :
+
+```
+(gdb) x 0x804b220 // en phase_5+38
+0x804b220 <array.123>:	 "isrveawhobpnutfg\260\001"
+(gdb) x 0x804980b // en phase_5 + 70
+0x804980b:	 "giants"
+```
+
+Ce que je vais faire ici c'est que je vais regarder le comportement du programme au niveau de phase_5+89 pour toutes les lettres de l'alphabet et ainsi rentrer les bonnes lettres pour reproduire le mot giants.
+
+```
+abcdef : srveaw // s : a et a : e
+ghijkl : hobpnu // n : k
+mnopqr : tfgisr // g : o,  i : p  t : m et s : q
+stuvwx : veawho // a : u
+xz : bp
+==> opekma ou opekmq ou opukma ou opukmq
+```
+Encore une fois il faudra tester les 4 pour le password final.
+
+####Phase ^
