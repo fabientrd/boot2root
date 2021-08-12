@@ -356,7 +356,7 @@ On remarque plusieurs fonctions dans le main interessantes :
 0x08048ee8  secret_phase
 ```
 
-#### Phase1
+#### Phase 1
 
 ```
 gdb-peda$ disas phase_1
@@ -388,7 +388,7 @@ Public speaking is very easy.
 Phase 1 defused. How about the next one?
 ```
 
-####Phase2
+#### Phase 2
 
 ``` 
 gdb-peda$ disas phase_2
@@ -431,7 +431,7 @@ La fonction read_six_numbers nous laisse entendre que la deuxieme phase attend u
 
 Pour trouver les valeurs attendues nous y allons a tatons en regardant la valeur de eax a chaque passage dans la boucle et nous arrivons sur la suite suivante :1 2 6 24 120 720. Cette suite match bien avec l'indice présent dans le README
 
-####Phase 3
+#### Phase 3
 
 ```
 (gdb) disas phase_3
@@ -529,7 +529,7 @@ Nous remarquons ici la présence d'un scanf qui va attendre un int suivi d'un ch
 
 Donc avons donc 3 combinaisons possibles qui fonctionne toutes : 1 b 214, 2 b 755 et 7 b 524. Il faudra donc tester les 3 possibilités pour le password final.
 
-####Phase 4
+#### Phase 4
 
 Pour cette phase le README ne nous donne aucun indice.
 
@@ -625,7 +625,7 @@ Continuing.
 So you got that one.  Try this one.
 ```
 
-####Phase 5
+#### Phase 5
 Ici l'indice donne par le README est o en premiere position.
 
 ```
@@ -696,4 +696,70 @@ xz : bp
 ```
 Encore une fois il faudra tester les 4 pour le password final.
 
-####Phase6
+#### Phase 6
+
+Ici l'indice du README est 4. Le programme va attendre 6 int d'apres le read_six_numbers et le premier int sera donc un 4.
+
+Nous remarquons l'utilisation de plusieurs variables globales dans cette fonction : 
+
+```
+   0x08048da4 <+12>:	movl   $0x804b26c,-0x34(%ebp)
+   (gdb) x 0x804b26c
+   0x804b26c <node1>:	  <incomplete sequence \375>
+   (gdb) p node1
+   $3 = 253
+   (gdb) p node2
+   $4 = 725
+   (gdb) p node3
+   $5 = 301
+   (gdb) p node4
+   $6 = 997
+   (gdb) p node5
+   $7 = 212
+   (gdb) p node6
+   $8 = 432
+   (gdb)
+```
+
+6 node et 6 valeurs. Le premier int etant 4, nous remarquons que le node4 est le lus grand des 6. Essayons de mettre les nodes dans le bon ordre du plus grand au plus petit : 4 2 6 3 1 5
+Et c'est bon nous avons reussi la challenge.
+
+Mettons toutes les valeurs possibles des differents password pour tous les tester, il y aura 3 * 4 possibilités :
+```
+Publicspeakingisveryeasy.126241207201b2149opekma426315
+Publicspeakingisveryeasy.126241207201b2149opekmq426315
+Publicspeakingisveryeasy.126241207201b2149opukma426315
+Publicspeakingisveryeasy.126241207201b2149opukmp426315
+Publicspeakingisveryeasy.126241207202b7559opekma426315
+Publicspeakingisveryeasy.126241207202b7559opekmq426315
+Publicspeakingisveryeasy.126241207202b7559opukma426315
+Publicspeakingisveryeasy.126241207202b7559opukmq426315
+Publicspeakingisveryeasy.126241207207b5249opekma426315
+Publicspeakingisveryeasy.126241207207b5249opekmq426315
+Publicspeakingisveryeasy.126241207207b5249opukma426315
+Publicspeakingisveryeasy.126241207207b5249opukmq426315
+```
+
+Aie aucune combinaison n'est la bonne ... Pourtant tout est bon .. il doit donc y avoir une erreur dans le sujet ??
+
+Apres plusieurs essais nous tombons sur la bonne combinaison qui se termine par 426135, bizarre avec pour la phase 3 la combinaison 1 b 214
+su thor
+Password : Publicspeakingisveryeasy.126241207201b2149opekmq426135
+
+### THOR
+
+Nous sommes ici encore une fois en présence d'un README et fichier turtle.
+```
+thor@BornToSecHackMe:~$ cat README
+Finish this challenge and use the result as password for 'zaz' user.
+```
+Le fichier turtle me fait penser au module graphique python turtle qui est utilisé pour "deplacer" une tortue sur l'écran et ainsi former un dessin.
+
+Essayons d'utiliser ce module sur le fichier pour voir le resultat. On va donc recuperer le fichier sur notre VM Kali Linux :
+
+```
+scp thor@192.168.1.27:~/turtle ~/boot2root/
+```
+
+Ensuite on va créer un petit programme en python pour voir ce que ca donne 
+
