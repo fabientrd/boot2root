@@ -25,11 +25,12 @@ laurie@BornToSecHackMe:~$ uname -a
 Linux BornToSecHackMe 3.2.0-91-generic-pae #129-Ubuntu SMP Wed Sep 9 11:27:47 UTC 2015 i686 i686 i386 GNU/linux
 ```
 
-On va donc essayer d'utiliser un des exploits presents ici :
+On va donc essayer d'utiliser cet exploit :
 
-[PoCs](https://github.com/dirtycow/dirtycow.github.io/wiki/PoCs)
+[PoCs](https://github.com/evait-security/ClickNRoot/blob/master/1/exploit.c)
 
-Celui qui nous interesse ici est le dernier qui va generer un nouveau fichier /etc/passwd tout en gardant le vrai intact pour qu'on le restaure après.
+
+Ce dernier va generer un nouveau fichier /etc/passwd tout en gardant le vrai intact pour qu'on le restaure après.
 
 Il nous suffit de copy/paste le code puis de le compiler et d'executer le programme pour pouvoir se log en tant que root.
 
